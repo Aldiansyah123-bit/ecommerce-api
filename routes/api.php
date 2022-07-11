@@ -13,6 +13,10 @@ use App\Http\Controllers\Api\Customer\InvoiceController as CustomerInvoiceContro
 use App\Http\Controllers\Api\Customer\LoginController as CustomerLoginController;
 use App\Http\Controllers\Api\Customer\RegisterController;
 use App\Http\Controllers\Api\Customer\ReviewController;
+use App\Http\Controllers\Api\Web\CategoryController as WebCategoryController;
+use App\Http\Controllers\Api\Web\ProductController as WebProductController;
+use App\Http\Controllers\Api\Web\RajaOngkirController;
+use App\Http\Controllers\Api\Web\SliderController as WebSliderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -60,5 +64,10 @@ Route::prefix('customer')->group(function (){
 });
 
 Route::prefix('web')->group(function (){
-
+    Route::apiResource('/categories', WebCategoryController::class, ['except' => ['create','store','edit','update','destroy'], 'as' => 'web']);
+    Route::apiResource('products', WebProductController::class, ['except' => ['create','store','update','edit','destroy'], 'as' => 'web']);
+    Route::get('sliders', [WebSliderController::class, 'index'],['as' => 'web']);
+    Route::get('/rajaongkir/provinces', [RajaOngkirController::class,'getProvince'],['as'=>'web']);
+    Route::post('rajaongkir/cities',[RajaOngkirController::class, 'getCities'],['as'=>'web']);
+    Route::post('/rajaongkir/checkOngkir', [RajaOngkirController::class, 'checkOngkir'],['as' => 'web']);
 });
