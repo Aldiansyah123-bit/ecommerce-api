@@ -13,7 +13,10 @@ use App\Http\Controllers\Api\Customer\InvoiceController as CustomerInvoiceContro
 use App\Http\Controllers\Api\Customer\LoginController as CustomerLoginController;
 use App\Http\Controllers\Api\Customer\RegisterController;
 use App\Http\Controllers\Api\Customer\ReviewController;
+use App\Http\Controllers\Api\Web\CartController;
 use App\Http\Controllers\Api\Web\CategoryController as WebCategoryController;
+use App\Http\Controllers\Api\Web\CheckoutController;
+use App\Http\Controllers\Api\Web\NotificationHandlerController;
 use App\Http\Controllers\Api\Web\ProductController as WebProductController;
 use App\Http\Controllers\Api\Web\RajaOngkirController;
 use App\Http\Controllers\Api\Web\SliderController as WebSliderController;
@@ -33,7 +36,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function  (){
     Route::post('/login',[LoginController::class, 'index', ['as' => 'admin']]);
-
     Route::group(['middleware' => 'auth:api_admin'],function () {
         Route::get('/user',[LoginController::class,'getUser', ['as' => 'admin']]);
         Route::get('/refresh',[LoginController::class, 'refreshToken', ['as' => 'admin']]);
@@ -51,12 +53,10 @@ Route::prefix('admin')->group(function  (){
 Route::prefix('customer')->group(function (){
     Route::post('/register',[RegisterController::class, 'store'], ['as' => 'customer']);
     Route::post('/login',[CustomerLoginController::class, 'index'], ['as' => 'customer']);
-
     Route::group(['middleware' => 'auth:api_customer'], function(){
         Route::get('/user', [CustomerLoginController::class, 'getUser'], ['as' => 'customer']);
         Route::get('/refresh', [CustomerLoginController::class, 'refreshToken'],['as' => 'customer']);
         Route::post('/logout', [CustomerLoginController::class, 'logout'],['as' => 'customer']);
-
         Route::get('/dashboard', [CustomerDashboardController::class, 'index'], ['as'=> 'customer']);
         Route::apiResource('/invoices', CustomerInvoiceController::class, ['except' => ['create','store','edit','update','destroy'],'as'=>'customer']);
         Route::post('reviews',[ReviewController::class, 'store'],['as'=>'customer']);
@@ -70,4 +70,12 @@ Route::prefix('web')->group(function (){
     Route::get('/rajaongkir/provinces', [RajaOngkirController::class,'getProvince'],['as'=>'web']);
     Route::post('rajaongkir/cities',[RajaOngkirController::class, 'getCities'],['as'=>'web']);
     Route::post('/rajaongkir/checkOngkir', [RajaOngkirController::class, 'checkOngkir'],['as' => 'web']);
+    Route::get('/carts', [CartController::class, 'index'], ['as' => 'web']);
+    Route::post('/carts', [CartController::class, 'store'], ['as' => 'web']);
+    Route::get('/carts/total_price', [CartController::class, 'getPrice'], ['as' => 'web']);
+    Route::get('/carts/total_weight', [CartController::class, 'getWeight'], ['as' => 'web']);
+    Route::post('/carts/remove', [CartController::class, 'removeCart'], ['as' => 'web']);
+
+    Route::post('/checkout', [CheckoutController::class, 'store'], ['as' => 'web']);
+    Route::post('/notification', [NotificationHandlerController::class, 'index'], ['as' => 'web']);
 });
